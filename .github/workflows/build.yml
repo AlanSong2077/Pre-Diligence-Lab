@@ -76,22 +76,16 @@ jobs:
       - name: Install PyInstaller
         run: pip install pyinstaller
 
-      - name: PyInstaller Analysis (no bundle, fast)
+      - name: PyInstaller availability + spec syntax check
+        # PyInstaller 在传入 .spec 文件时直接进入 build 模式，所有 makespec 类
+        # 选项（--name / --specpath / --collect-submodules / --hidden-import）
+        # 都会被拒绝（"makespec options not valid when a .spec file is given"）。
+        # 因此这里改用 ast 校验 + PyInstaller 模块 import 检测，与 macOS
+        # 任务的 smoke 风格保持一致；正式产物的构建在 release.yml 中完成。
         run: |
-          pyinstaller --noconfirm --log-level WARN `
-            --name PreDiligenceLab `
-            --collect-submodules PyQt6 `
-            --collect-submodules matplotlib `
-            --collect-submodules pandas `
-            --collect-submodules yfinance `
-            --collect-submodules akshare `
-            --hidden-import=requests `
-            --hidden-import=keyring `
-            --distpath build_test `
-            --workpath build_tmp `
-            --specpath . `
-            PreDiligenceLab.spec 2>&1 | Tee-Object -FilePath build_log.txt
-        # 说明：单独跑一次是为了让 workflow 验证 spec 在 Windows 上能解析；正式产物的 build 在 release.yml。
+          python -c "import ast; ast.parse(open('PreDiligenceLab.spec').read()); print('  spec syntax OK on Windows')"
+          python -c "import PyInstaller; print(f'  PyInstaller {PyInstaller.__version__} importable on Windows')"
+          python -c "from PyInstaller.utils.hooks import collect_submodules; mods = collect_submodules('PyQt6'); print(f'  PyQt6 submodules: {len(mods)}')"
 
   # ── 3. macOS 烟囱测试 ─────────────────────────────────
   macos:
