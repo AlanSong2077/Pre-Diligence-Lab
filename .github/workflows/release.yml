@@ -122,15 +122,9 @@ jobs:
 
   # ── 3. macOS 打包（.app + .zip）──────────────────────────
   macos:
-    name: build (macos)
+    name: build (macos-arm64)
     needs: [source-archive]
-    strategy:
-      fail-fast: false
-      matrix:
-        config:
-          - { arch: x86_64, runner: macos-13 }
-          - { arch: arm64,  runner: macos-14 }
-    runs-on: ${{ matrix.config.runner }}
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
 
@@ -160,15 +154,15 @@ jobs:
           VERSION="${{ needs.source-archive.outputs.version }}"
           mkdir -p release
           cd dist
-          zip -r "../release/PreDiligenceLab-${VERSION}-macOS-${{ matrix.config.arch }}.zip" PreDiligenceLab.app -x "*.DS_Store"
+          zip -r "../release/PreDiligenceLab-${VERSION}-macOS-arm64.zip" PreDiligenceLab.app -x "*.DS_Store"
           cd ..
           ls -lh release/
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
-          name: macos-build-${{ matrix.config.arch }}
-          path: release/PreDiligenceLab-${{ needs.source-archive.outputs.version }}-macOS-${{ matrix.config.arch }}.zip
+          name: macos-build-arm64
+          path: release/PreDiligenceLab-${{ needs.source-archive.outputs.version }}-macOS-arm64.zip
           if-no-files-found: error
 
   # ── 4. 创建 GitHub Release 并挂所有 artifact ────────────
