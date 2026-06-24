@@ -14,5 +14,5 @@
 ## 安全设计说明
 
 - **密钥存储**：所有 API Key 清写入**系统密钥**（macOS Keychain / Windows Credential Vault）；JSON 备份文件权限设为 600，**禁止写入源码或日志**。
-- **网络请求**：所有外部请求走 `requests` / `urllib3`，未引入额外的不安全依赖；TLS 校验默认开启。
-- **本地数据**：用户配置、收藏、下载的 PDF 均存储在 `~/.prediligencelab/`，**不上传任何服务端**。
+- **网络请求**：外部请求走 requests 或 urllib3，未引入额外的不安全依赖；TLS 校验默认开启。
+- **本地数据**：用户配置、收藏、下载的 PDF 均存储在 `~/.prediligencelab/`，**禁止上传服务端**。
