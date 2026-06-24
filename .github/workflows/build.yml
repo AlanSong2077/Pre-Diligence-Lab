@@ -44,6 +44,7 @@ jobs:
 
       - name: Validate workflow YAMLs
         run: |
+          pip install pyyaml
           python -c "
           import yaml, glob, sys
           for p in glob.glob('.github/workflows/*.yml'):
