@@ -1,6 +1,6 @@
-﻿; ============================================================
-; installer.iss  —  Inno Setup 安装脚本
-; 用于生成 Windows 安装包 PreDiligenceLab_Setup.exe
+; ============================================================
+; installer.iss  —  Inno Setup Script
+; Generates Windows installer PreDiligenceLab_Setup.exe
 ; ============================================================
 
 #define MyAppName "Pre-Diligence Lab"
@@ -22,29 +22,26 @@ Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 PrivilegesRequired=lowest
-; 如有图标取消注释：
+; Uncomment if icon is available:
 ; SetupIconFile=assets\icon.ico
 ; UninstallDisplayIcon={app}\{#MyAppExeName}
 
 [Languages]
-Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
-; fallback: 如果 ChineseSimplified.isl 不存在则用英文
-; CI 环境会先下载该文件到 Inno Setup Languages 目录
+Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "创建桌面快捷方式"; GroupDescription: "附加图标:"; Flags: checkedonce
+Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription: "Additional icons:"; Flags: checkedonce
 
 [Files]
-; PyInstaller 实际产出 dist\PreDiligenceLab\ (目录)
-; └─ PreDiligenceLab.exe
-; └─ _internal\   (PyQt6/.pyd/.dll 等)
-; 所以 Source 要指向整个目录
+; PyInstaller output: dist\PreDiligenceLab\
+; ├─ PreDiligenceLab.exe
+; └─ _internal\   (PyQt6/.pyd/.dll etc.)
 Source: "dist\PreDiligenceLab\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}";          Filename: "{app}\{#MyAppExeName}"
-Name: "{group}\卸载 {#MyAppName}";     Filename: "{uninstallexe}"
+Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#MyAppName}";    Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "立即运行 {#MyAppName}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#MyAppExeName}"; Description: "Launch {#MyAppName}"; Flags: nowait postinstall skipifsilent
