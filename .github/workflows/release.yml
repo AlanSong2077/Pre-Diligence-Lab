@@ -154,6 +154,7 @@ jobs:
       - name: Zip .app (excluding codesign if no cert)
         run: |
           VERSION="${{ needs.source-archive.outputs.version }}"
+          mkdir -p release
           cd dist
           # 跳过 .DS_Store 等
           zip -r "../release/PreDiligenceLab-${VERSION}-macOS-${{ matrix.config.arch }}.zip" PreDiligenceLab.app -x "*.DS_Store"

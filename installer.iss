@@ -32,7 +32,11 @@ Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.i
 Name: "desktopicon"; Description: "创建桌面快捷方式"; GroupDescription: "附加图标:"; Flags: unchecked
 
 [Files]
-Source: "dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+; PyInstaller 实际产出 dist\PreDiligenceLab\ (目录)
+; └─ PreDiligenceLab.exe
+; └─ _internal\   (PyQt6/.pyd/.dll 等)
+; 所以 Source 要指向整个目录
+Source: "dist\PreDiligenceLab\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}";          Filename: "{app}\{#MyAppExeName}"
