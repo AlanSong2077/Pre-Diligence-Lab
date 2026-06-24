@@ -103,7 +103,6 @@ jobs:
         run: |
           $version = "${{ needs.source-archive.outputs.version }}"
           Compress-Archive -Path dist/PreDiligenceLab/* -DestinationPath "release/PreDiligenceLab-$version-windows-x64.zip"
-          Compress-Archive -Path dist/PreDiligenceLab/PreDiligenceLab.exe -DestinationPath "release/PreDiligenceLab-$version-windows-x64-single.exe.zip"
           Get-ChildItem release/
 
       - name: Upload Windows artifacts
@@ -121,9 +120,14 @@ jobs:
     needs: [source-archive]
     strategy:
       # 同时跑 Intel 与 Apple Silicon
+      # GitHub runner label:
+      #   macos-13 = Intel,  macos-14 / macos-15 = Apple Silicon
+      fail-fast: false
       matrix:
-        arch: [x86_64, arm64]
-    runs-on: macos-${{ matrix.arch }}
+        config:
+          - { arch: x86_64, runner: macos-13 }
+          - { arch: arm64,  runner: macos-14 }
+    runs-on: ${{ matrix.config.runner }}
     steps:
       - uses: actions/checkout@v4
 
@@ -152,15 +156,15 @@ jobs:
           VERSION="${{ needs.source-archive.outputs.version }}"
           cd dist
           # 跳过 .DS_Store 等
-          zip -r "../release/PreDiligenceLab-${VERSION}-macOS-${{ matrix.arch }}.zip" PreDiligenceLab.app -x "*.DS_Store"
+          zip -r "../release/PreDiligenceLab-${VERSION}-macOS-${{ matrix.config.arch }}.zip" PreDiligenceLab.app -x "*.DS_Store"
           cd ..
           ls -lh release/
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
-          name: macos-build-${{ matrix.arch }}
-          path: release/PreDiligenceLab-${{ needs.source-archive.outputs.version }}-macOS-${{ matrix.arch }}.zip
+          name: macos-build-${{ matrix.config.arch }}
+          path: release/PreDiligenceLab-${{ needs.source-archive.outputs.version }}-macOS-${{ matrix.config.arch }}.zip
           if-no-files-found: error
 
   # ── 4. 创建 GitHub Release 并挂所有 artifact ────────────
